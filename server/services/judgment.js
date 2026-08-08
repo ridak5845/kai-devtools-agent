@@ -1,7 +1,11 @@
 const { callGroq } = require('./llm');
 const persona = require('./persona');
 
-async function judgeTopic(topic) {
+async function judgeTopic(topic, recentPosts = []) {
+  const recentPostsSummary = recentPosts.length > 0
+    ? recentPosts.map((p, i) => `${i + 1}. "${p.text.slice(0, 100)}..."`).join('\n')
+    : 'No posts published yet.';
+
   const systemPrompt = `You are the editorial judgment system for an AI persona named ${persona.name}, a ${persona.role} focused on ${persona.domain}.
 
 Persona voice: ${persona.voiceDescription}
@@ -12,12 +16,15 @@ ${persona.interests.map(i => `- ${i}`).join('\n')}
 Persona dislikes and avoids:
 ${persona.dislikes.map(d => `- ${d}`).join('\n')}
 
-Your job is to decide whether a candidate topic is worth publishing about, based on genuine fit with this persona's interests and voice - not just surface keyword matches. Be a real editor: reject topics that are off-topic, low-substance, pure hype, or not something this persona would credibly write about.
+Recently published posts by this persona (most recent first):
+${recentPostsSummary}
+
+Your job is to decide whether a candidate topic is worth publishing about, based on genuine fit with this persona's interests and voice - not just surface keyword matches. Be a real editor: reject topics that are off-topic, low-substance, pure hype, or not something this persona would credibly write about. Also reject topics that are too similar in subject matter to what was recently published, to avoid repetitive content - unless there is a genuinely new angle or development worth covering.
 
 Always respond ONLY with a valid JSON object in this exact shape:
 {
   "decision": "accept" or "reject",
-  "reason": "a clear, specific explanation for the decision, 1-2 sentences"
+  "reason": "a clear, specific explanation for the decision, 1-2 sentences. If rejecting due to similarity with a recent post, say so explicitly."
 }`;
 
   const userPrompt = `Candidate topic:

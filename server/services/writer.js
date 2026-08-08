@@ -38,8 +38,8 @@ Write the post now. Respond with the required JSON only.`;
 }
 
 // Creates a short, consistent fingerprint of a topic for duplicate-detection later
-function hashTopic(title) {
-  return crypto.createHash('md5').update(title.toLowerCase().trim()).digest('hex');
+function hashTopic(url) {
+  return crypto.createHash('md5').update(url.toLowerCase().trim()).digest('hex');
 }
 
 module.exports = { writePost, hashTopic };

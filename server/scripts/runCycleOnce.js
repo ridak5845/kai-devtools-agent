@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { fetchCandidateTopics } = require('../services/discovery');
 const { judgeTopic } = require('../services/judgment');
 const { writePost, hashTopic } = require('../services/writer');
+const { isAlreadyPublished, isRecentlyRejected, getRecentPostSummaries } = require('../services/memory');
 const Post = require('../models/Post');
 const RejectedTopic = require('../models/RejectedTopic');
 
@@ -31,11 +32,20 @@ async function runCycle() {
   let published = false;
 
   for (const topic of topics) {
-    console.log(`Evaluating: "${topic.title}"`);
-    const judgment = await judgeTopic(topic);
-    console.log(`  Decision: ${judgment.decision.toUpperCase()} - ${judgment.reason}\n`);
+    const topicHash = hashTopic(topic.url);
 
-    const topicHash = hashTopic(topic.title);
+    const alreadyPublished = await isAlreadyPublished(AGENT_ID, topicHash);
+    const alreadyRejected = await isRecentlyRejected(AGENT_ID, topicHash);
+
+    if (alreadyPublished || alreadyRejected) {
+      console.log(`Skipping already-seen topic: "${topic.title}"\n`);
+      continue;
+    }
+
+    console.log(`Evaluating: "${topic.title}"`);
+    const recentPosts = await getRecentPostSummaries(AGENT_ID);
+    const judgment = await judgeTopic(topic, recentPosts);
+    console.log(`  Decision: ${judgment.decision.toUpperCase()} - ${judgment.reason}\n`);
 
     if (judgment.decision === 'reject') {
       await RejectedTopic.create({

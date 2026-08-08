@@ -6,6 +6,7 @@ const RejectedTopic = require('../models/RejectedTopic');
 const { fetchCandidateTopics } = require('../services/discovery');
 const { judgeTopic } = require('../services/judgment');
 const { writePost, hashTopic } = require('../services/writer');
+const { isAlreadyPublished, isRecentlyRejected, getRecentPostSummaries } = require('../services/memory');
 
 // Runs one publish cycle for a single agent
 async function runCycleForAgent(agent) {
@@ -23,7 +24,7 @@ async function runCycleForAgent(agent) {
 
     for (const topic of topics) {
       const judgment = await judgeTopic(topic);
-      const topicHash = hashTopic(topic.title);
+      const topicHash = hashTopic(topic.url);
 
       if (judgment.decision === 'reject') {
         await RejectedTopic.create({
