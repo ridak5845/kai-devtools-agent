@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 import './App.css';
+import Dock from './Dock';
+import BorderGlow from './BorderGlow';
+import SpotlightCard from './SpotlightCard';
+import Ferrofluid from './Ferrofluid';
+import { VscDashboard, VscGraph, VscListUnordered, VscSettingsGear } from 'react-icons/vsc';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const OFFICIAL_AGENT_ID = '';
@@ -63,83 +68,99 @@ function App() {
   };
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'analytics', label: 'Analytics' },
-    { id: 'logs', label: 'Logs' },
-    { id: 'settings', label: 'Settings' }
+    { id: 'dashboard', label: 'Dashboard', icon: <VscDashboard size={20} /> },
+    { id: 'analytics', label: 'Analytics', icon: <VscGraph size={20} /> },
+    { id: 'logs', label: 'Logs', icon: <VscListUnordered size={20} /> },
+    { id: 'settings', label: 'Settings', icon: <VscSettingsGear size={20} /> }
   ];
 
+  const dockItems = tabs.map((tab) => ({
+    icon: tab.icon,
+    label: tab.label,
+    onClick: () => setActiveTab(tab.id),
+    className: activeTab === tab.id ? 'dock-item-active' : ''
+  }));
+
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="sidebar-brand">Kai</div>
-        <nav className="sidebar-nav" aria-label="Dashboard sections">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`sidebar-tab ${activeTab === tab.id ? 'sidebar-tab-active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-              aria-current={activeTab === tab.id ? 'page' : undefined}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-status">
-          <span className="pulse-dot" />
-          <span>Live Feed</span>
-        </div>
-      </aside>
-
-      <main className="app-content">
-      <div className="app-content-inner">
-      <header className="header">
-        <h1>Kai</h1>
-        <p className="tagline-main">Autonomous AI Creator</p>
-        <p className="subtitle">Developer Advocate · AI Infrastructure · Practical AI Engineering</p>
-        <p className="tagline">
-          Shipping practical AI engineering insights for developers building real production systems.
-        </p>
-      </header>
-
-
-      {showDevInput && (
-        <div className="agent-input">
-          <input
-            type="text"
-            placeholder="Enter agent ID (dev/testing only)"
-            value={agentId}
-            onChange={(e) => setAgentId(e.target.value)}
-            aria-label="Agent ID input for testing"
-          />
-          <button onClick={handleLoadFeed} aria-label="Load data for entered agent ID">
-            Load
-          </button>
-        </div>
-      )}
-
-      {loading && <p className="status-msg">Loading...</p>}
-      {error && <p className="status-msg error">Error: {error}</p>}
-
-      {!loading && !error && agentId && (
-        <>
-          {activeTab === 'dashboard' && (
-            <DashboardTab posts={posts} analytics={analytics} />
-          )}
-          {activeTab === 'analytics' && (
-            <AnalyticsTab analytics={analytics} />
-          )}
-          {activeTab === 'logs' && (
-            <LogsTab logs={logs} />
-          )}
-          {activeTab === 'settings' && (
-            <SettingsTab />
-          )}
-        </>
-      )}
+    <>
+      <div className="bg-fluid">
+        <Ferrofluid
+          colors={["#1d2331", "#8b53fe", "#8eff01"]}
+          backgroundColor="#07090b"
+          speed={0.4}
+          scale={1.6}
+          turbulence={0.9}
+          fluidity={0.15}
+          rimWidth={0.22}
+          sharpness={2.8}
+          shimmer={1.2}
+          glow={1.8}
+          flowDirection="down"
+          opacity={0.85}
+          mouseInteraction={true}
+          mouseStrength={0.8}
+          mouseRadius={0.3}
+        />
       </div>
-      </main>
-    </div>
+
+      <div className="app-shell">
+        <main className="app-content">
+          <div className="app-content-inner">
+            <div className="live-badge">
+              <span className="pulse-dot" />
+              <span>Live Feed</span>
+            </div>
+            <header className="header">
+              <h1>Kai</h1>
+              <p className="tagline-main">Autonomous AI Creator</p>
+              <p className="subtitle">Developer Advocate · AI Infrastructure · Practical AI Engineering</p>
+              <p className="tagline">
+                Shipping practical AI engineering insights for developers building real production systems.
+              </p>
+            </header>
+
+            {showDevInput && (
+              <SpotlightCard className="agent-input-spotlight" spotlightColor="rgba(142, 255, 1, 0.25)">
+                <div className="agent-input">
+                  <input
+                    type="text"
+                    placeholder="Enter agent ID (dev/testing only)"
+                    value={agentId}
+                    onChange={(e) => setAgentId(e.target.value)}
+                    aria-label="Agent ID input for testing"
+                  />
+                  <button onClick={handleLoadFeed} aria-label="Load data for entered agent ID">
+                    Load
+                  </button>
+                </div>
+              </SpotlightCard>
+            )}
+
+            {loading && <p className="status-msg">Loading...</p>}
+            {error && <p className="status-msg error">Error: {error}</p>}
+
+            {!loading && !error && agentId && (
+              <>
+                {activeTab === 'dashboard' && (
+                  <DashboardTab posts={posts} analytics={analytics} />
+                )}
+                {activeTab === 'analytics' && (
+                  <AnalyticsTab analytics={analytics} />
+                )}
+                {activeTab === 'logs' && (
+                  <LogsTab logs={logs} />
+                )}
+                {activeTab === 'settings' && (
+                  <SettingsTab />
+                )}
+              </>
+            )}
+          </div>
+        </main>
+      </div>
+
+      <Dock items={dockItems} panelHeight={64} baseItemSize={48} magnification={64} />
+    </>
   );
 }
 
@@ -182,34 +203,47 @@ function DashboardTab({ posts, analytics }) {
 
       <section className="feed" aria-label="Published posts">
         {posts.map((post) => (
-          <article key={post.id} className="post">
-            <div className="post-author">
-              <span className="post-author-name">Kai</span>
-              <span className="post-author-role">Developer Advocate</span>
-            </div>
-            <p className="post-text">{post.text}</p>
-            <div className="post-meta">
-              <time dateTime={post.createdAt}>
-                {new Date(post.createdAt).toLocaleString()}
-              </time>
-            </div>
-            <details className="rationale">
-              <summary>Why this post?</summary>
-              <p>{post.rationale}</p>
-            </details>
-            {post.sources.length > 0 && (
-              <details className="sources-section">
-                <summary>🔗 Sources</summary>
-                <ul className="sources">
-                  {post.sources.map((src, i) => (
-                    <li key={i}>
-                      <a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
-                    </li>
-                  ))}
-                </ul>
+          <BorderGlow
+            key={post.id}
+            backgroundColor="#1a2030"
+            glowColor="270 90% 65%"
+            colors={['#8eff01', '#8b53fe', '#1d2331']}
+            borderRadius={24}
+            glowRadius={36}
+            glowIntensity={1.1}
+            edgeSensitivity={35}
+            coneSpread={28}
+            fillOpacity={0.4}
+          >
+            <article className="post">
+              <div className="post-author">
+                <span className="post-author-name">Kai</span>
+                <span className="post-author-role">Developer Advocate</span>
+              </div>
+              <p className="post-text">{post.text}</p>
+              <div className="post-meta">
+                <time dateTime={post.createdAt}>
+                  {new Date(post.createdAt).toLocaleString()}
+                </time>
+              </div>
+              <details className="rationale">
+                <summary>Why this post?</summary>
+                <p>{post.rationale}</p>
               </details>
-            )}
-          </article>
+              {post.sources.length > 0 && (
+                <details className="sources-section">
+                  <summary>🔗 Sources</summary>
+                  <ul className="sources">
+                    {post.sources.map((src, i) => (
+                      <li key={i}>
+                        <a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+            </article>
+          </BorderGlow>
         ))}
       </section>
     </>
