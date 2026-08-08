@@ -14,6 +14,10 @@ const agentSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date()
   },
+  isCycleRunning: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: () => new Date()

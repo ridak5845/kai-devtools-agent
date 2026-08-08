@@ -81,12 +81,22 @@ async function schedulerTick() {
     }
 
     for (const agent of dueAgents) {
-      await runCycleForAgent(agent);
+      if (agent.isCycleRunning) {
+        console.log(`  Skipping ${agent.agentId} - cycle already in progress`);
+        continue;
+      }
 
-      agent.nextPublishAt = getNextPublishTime();
+      agent.isCycleRunning = true;
       await agent.save();
 
-      console.log(`  Next publish for ${agent.agentId} scheduled at ${agent.nextPublishAt.toISOString()}`);
+      try {
+        await runCycleForAgent(agent);
+      } finally {
+        agent.isCycleRunning = false;
+        agent.nextPublishAt = getNextPublishTime();
+        await agent.save();
+        console.log(`  Next publish for ${agent.agentId} scheduled at ${agent.nextPublishAt.toISOString()}`);
+      }
     }
 
   } catch (error) {
