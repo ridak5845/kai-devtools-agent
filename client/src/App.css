@@ -60,7 +60,7 @@ body {
   padding: 0.65rem 1.25rem;
   border-radius: 8px;
   border: none;
-  background: #6366f1;
+  background: #4c4de6;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -68,9 +68,8 @@ body {
 }
 
 .agent-input button:hover {
-  background: #4f46e5;
+  background: #3f3fd1;
 }
-
 .status {
   text-align: center;
   color: #9ca3af;
