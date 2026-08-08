@@ -3,6 +3,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const Agent = require('../models/Agent');
 const Post = require('../models/Post');
+const RejectedTopic = require('../models/RejectedTopic');
 
 // POST /api/agent/init
 router.post('/init', async (req, res) => {
@@ -58,6 +59,65 @@ router.get('/feed', async (req, res) => {
   } catch (error) {
     console.error('Feed error:', error.message);
     res.status(500).json({ error: 'Failed to retrieve feed' });
+  }
+});
+
+// GET /api/agent/logs?agentId=...
+router.get('/logs', async (req, res) => {
+  try {
+    const { agentId } = req.query;
+    if (!agentId) {
+      return res.status(400).json({ error: 'agentId query parameter is required' });
+    }
+
+    const rejections = await RejectedTopic.find({ agentId })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    const formatted = rejections.map(r => ({
+      topic: r.topic,
+      reason: r.reason,
+      createdAt: r.createdAt.toISOString()
+    }));
+
+    res.json({ rejections: formatted });
+
+  } catch (error) {
+    console.error('Logs error:', error.message);
+    res.status(500).json({ error: 'Failed to retrieve logs' });
+  }
+});
+
+// GET /api/agent/analytics?agentId=...
+router.get('/analytics', async (req, res) => {
+  try {
+    const { agentId } = req.query;
+    if (!agentId) {
+      return res.status(400).json({ error: 'agentId query parameter is required' });
+    }
+
+    const postCount = await Post.countDocuments({ agentId });
+    const rejectedCount = await RejectedTopic.countDocuments({ agentId });
+    const totalEvaluated = postCount + rejectedCount;
+    const acceptRate = totalEvaluated > 0
+      ? Math.round((postCount / totalEvaluated) * 100)
+      : 0;
+
+    const latestPost = await Post.findOne({ agentId }).sort({ createdAt: -1 });
+    const agent = await Agent.findOne({ agentId });
+
+    res.json({
+      postsPublished: postCount,
+      topicsRejected: rejectedCount,
+      totalTopicsEvaluated: totalEvaluated,
+      acceptRate,
+      lastPublishedAt: latestPost ? latestPost.createdAt.toISOString() : null,
+      nextPublishAt: agent ? agent.nextPublishAt.toISOString() : null
+    });
+
+  } catch (error) {
+    console.error('Analytics error:', error.message);
+    res.status(500).json({ error: 'Failed to retrieve analytics' });
   }
 });
 
