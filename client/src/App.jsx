@@ -41,7 +41,7 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <main className="app">
       <header className="header">
         <h1>Kai</h1>
         <p className="subtitle">Developer Advocate · Developer Tools & AI Infrastructure</p>
@@ -54,7 +54,7 @@ function App() {
           value={agentId}
           onChange={(e) => setAgentId(e.target.value)}
         />
-        <button onClick={handleLoadFeed}>Load Feed</button>
+        <button onClick={handleLoadFeed} aria-label="Load feed for entered agent ID">Load Feed</button>
       </div>
 
       {loading && <p className="status">Loading...</p>}
@@ -93,8 +93,8 @@ function App() {
           </article>
         ))}
       </div>
-    </div>
-  );
+    </main>
+  );  
 }
 
 export default App;
