@@ -55,20 +55,31 @@ async function fetchFromDevTo() {
 }
 
 // Main function: tries HN first, falls back to Dev.to on any failure
+// Removes topics with duplicate URLs from a single batch of results
+function dedupeTopics(topics) {
+  const seen = new Set();
+  return topics.filter(topic => {
+    const key = topic.url.toLowerCase().trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 async function fetchCandidateTopics() {
   try {
     const topics = await fetchFromHackerNews();
     if (topics.length > 0) {
-      return topics;
+      return dedupeTopics(topics);
     }
     console.log('HN returned no relevant topics, trying Dev.to...');
-    return await fetchFromDevTo();
+    return dedupeTopics(await fetchFromDevTo());
 
   } catch (error) {
     console.error('HN discovery failed, falling back to Dev.to:', error.message);
 
     try {
-      return await fetchFromDevTo();
+      return dedupeTopics(await fetchFromDevTo());
     } catch (fallbackError) {
       console.error('Dev.to fallback also failed:', fallbackError.message);
       return [];

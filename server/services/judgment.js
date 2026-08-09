@@ -19,7 +19,7 @@ ${persona.dislikes.map(d => `- ${d}`).join('\n')}
 Recently published posts by this persona (most recent first):
 ${recentPostsSummary}
 
-Your job is to decide whether a candidate topic is worth publishing about, based on genuine fit with this persona's interests and voice - not just surface keyword matches. Be a real editor: reject topics that are off-topic, low-substance, pure hype, or not something this persona would credibly write about. Also reject topics that are too similar in subject matter to what was recently published, to avoid repetitive content - unless there is a genuinely new angle or development worth covering.
+Your job is to decide whether a candidate topic is worth publishing about, based on genuine fit with this persona's interests and voice. Be a thoughtful editor, not an overly strict gatekeeper: if a topic has a reasonable, credible connection to developer tools, AI infrastructure, or practical software engineering, lean toward accepting it, even if the connection isn't perfectly central. Reserve rejection for topics that are genuinely off-topic (no meaningful connection to software/AI/dev tools), pure hype with zero substance, or near-duplicates of very recently published content without any new angle.
 
 Always respond ONLY with a valid JSON object in this exact shape:
 {
