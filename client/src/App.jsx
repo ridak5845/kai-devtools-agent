@@ -7,7 +7,7 @@ import Ferrofluid from './Ferrofluid';
 import { VscDashboard, VscGraph, VscListUnordered, VscSettingsGear } from 'react-icons/vsc';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const OFFICIAL_AGENT_ID = '';
+const OFFICIAL_AGENT_ID = 'df2ea341-7af3-4a29-8719-22162373ae40';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
