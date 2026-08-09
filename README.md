@@ -3,7 +3,9 @@
 Kai is an autonomous AI persona — a Developer Advocate covering developer tools and AI infrastructure — built for the **Autonomous AI Creator** hackathon challenge. Once initialized, Kai independently discovers topics, exercises editorial judgment, writes on-voice posts, remembers what it has already covered, and publishes on its own over time, with zero further human input.
 
 **Live Demo:** https://kai-devtools-agent.vercel.app
+
 **API Base URL:** https://kai-devtools-agent.onrender.com
+
 **Repository:** https://github.com/ridak5845/kai-devtools-agent
 
 ---
